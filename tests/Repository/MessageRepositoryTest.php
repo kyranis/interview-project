@@ -1,19 +1,55 @@
 <?php
 declare(strict_types=1);
 
-namespace Repository;
+namespace App\Tests\Repository;
 
-use App\Repository\MessageRepository;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Entity\TextMessage;
+use App\Repository\TextMessageRepository;
+use App\Tests\ServiceTestCase;
 
-class MessageRepositoryTest extends KernelTestCase
+class MessageRepositoryTest extends ServiceTestCase
 {
-    public function test_it_has_connection(): void
+    /**
+     * @var TextMessageRepository $textMessageRepository
+     */
+    private TextMessageRepository $textMessageRepository;
+    public function setUp(): void
     {
-        self::bootKernel();
+        parent::setUp();
+        $this->textMessageRepository = self::getContainer()->get(TextMessageRepository::class); // @phpstan-ignore-line
+    }
+    function test_findByStatus_with_param(): void
+    {
+        $this->loadTestData();
 
-        $messages = self::getContainer()->get(MessageRepository::class);
+        $result = $this->textMessageRepository->findByStatus('read');
 
-        $this->assertSame([], $messages->findAll());
+        $this->assertCount(1, $result);
+        $this->assertEquals('read', $result[0]->getStatus());
+    }
+
+    function test_findByStatus_without_param(): void
+    {
+        $this->loadTestData();
+
+        $result = $this->textMessageRepository->findByStatus('');
+
+        $this->assertCount(2, $result);
+        $this->assertSame($result, $this->textMessageRepository->findAll());
+    }
+
+    function test_create(): void
+    {
+        $this->loadTestData();
+
+        $this->assertCount(2, $this->textMessageRepository->findAll());
+
+        $newMessageId = $this->textMessageRepository->create('New Test Message');
+
+        $this->assertCount(3, $this->textMessageRepository->findAll());
+
+        $this->assertInstanceOf(TextMessage::class, $this->textMessageRepository->find($newMessageId));
+
+        $this->assertEquals('New Test Message', $this->textMessageRepository->find($newMessageId)->getText());
     }
 }

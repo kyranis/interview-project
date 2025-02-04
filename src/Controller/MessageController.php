@@ -56,7 +56,7 @@ class MessageController extends AbstractController
             ], $textMessages);
         }
 
-        return $this->json(['messages',$result], Response::HTTP_OK);
+        return $this->json(['messages' => $result], Response::HTTP_OK);
     }
 
     /**

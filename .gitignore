@@ -27,3 +27,7 @@
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
+
+###> PHPStorm IDE ###
+/.idea/
+/.idea/dataSources.xml
